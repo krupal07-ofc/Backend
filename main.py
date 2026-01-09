@@ -25,7 +25,7 @@ def startup():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://civic-voice1-8ktylj823-aditya-growais-projects.vercel.app"
+        "https://civic-voice-frontend-omega.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
