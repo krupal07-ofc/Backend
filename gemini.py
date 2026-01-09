@@ -12,7 +12,7 @@ API_KEY = os.getenv("GOOGLE_API_KEY")
 if not API_KEY:
     raise RuntimeError("GOOGLE_API_KEY is not set")
 
-client = genai.Client(api_key=API_KEY)
+genai.configure(api_key=API_KEY)
 
 
 def detect_issue(image_bytes: bytes) -> str:
@@ -28,9 +28,10 @@ electric_transformer
 unknown
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[prompt, image]
+    response = genai.GenerativeModel("gemini-2.5-flash").generate_content(
+
+                [prompt, image]
+    
     )
 
     text = (response.text or "").lower()
