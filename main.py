@@ -76,7 +76,7 @@ def register_user(data: RegisterRequest, db: Session = Depends(get_db)):
 @app.post("/login")
 def login_user(data: RegisterRequest, db: Session = Depends(get_db)):
         try:
-        user = db.query(User).filter(
+            user = db.query(User).filter(
             User.email.ilike(data.email.lower())
         ).first()
 
