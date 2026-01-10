@@ -194,7 +194,7 @@ async def upload(
 @app.get("/issues")
 def get_issues(db: Session = Depends(get_db)):
     try:
-        issues = db.query(Issue).order_by(Issue.id.desc()).all()
+            issues = db.query(Issue).order_by(Issue.id.desc()).all()
         
         if not issues:
             return []
