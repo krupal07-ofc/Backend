@@ -75,19 +75,29 @@ def register_user(data: RegisterRequest, db: Session = Depends(get_db)):
 
 @app.post("/login")
 def login_user(data: RegisterRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == data.email).first()
+        try:
+        user = db.query(User).filter(
+            User.email.ilike(data.email.lower())
+        ).first()
 
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
-
-    if not verify_password(data.password, user.password):
-        raise HTTPException(status_code=400, detail="Invalid password")
-
-    return {
-        "message": "Login successful",
-        "user": {
-            "id": user.id,
-            "email": user.email
+            
+        if not user:
+            raise HTTPException(status_code=400, detail="User not found")
+        
+        if not verify_password(data.password, user.password):
+            raise HTTPException(status_code=400, detail="Invalid password")
+        
+        return {
+            "message": "Login successful",
+            "user": {
+                "id": user.id,
+                "email": user.email
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))        "email": user.email
         }
     }
 
@@ -181,18 +191,25 @@ async def upload(
 
 # ---------------- GET ALL ISSUES ----------------
 @app.get("/issues")
+@app.get("/issues")
 def get_issues(db: Session = Depends(get_db)):
-    issues = db.query(Issue).all()
-
-    return [
-        {
-            "id": issue.id,
-            "lat": issue.lat,
-            "lng": issue.lng,
-            "type": issue.type,
-            "status": issue.status,
-            "description": issue.description,
-            "image": issue.image,   # optional (for uploaded issues)
-        }
-        for issue in issues
-    ]
+    try:
+        issues = db.query(Issue).order_by(Issue.id.desc()).all()
+        
+        if not issues:
+            return []
+        
+        return [
+            {
+                "id": str(issue.id),
+                "lat": float(issue.lat),
+                "lng": float(issue.lng),
+                "type": issue.type,
+                "status": issue.status,
+                "description": issue.description or "",
+                "image": issue.image or None,
+            }
+            for issue in issues
+        ]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching issues: {str(e)}")
